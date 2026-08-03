@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<!-- スタイルシートやタイトルなどのhead情報を共通化 -->
+
+<head></head>
+
+<body>
+	<!-- メイン部 -->
+	<div class="container">
+		<h1>ログイン</h1>
+		<!-- ログイン失敗時のエラーメッセージ -->
+		<p th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']} != null"
+			th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}" class="text danger"></p>
+		<form th:method="post" th:action="@{/login}">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>ユーザ</td>
+						<td>
+							<input type="text" class="form-control w-25" id="login_id" name="login_id" />
+						</td>
+					</tr>
+					<tr>
+						<td>パスワード</td>
+						<td>
+							<input type="password" class="form-control w-25" id="password" name="password" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<input type="submit" class="btn btn-primary" value="ログイン">
+		</form>
+	</div>
+</body>
+
+</html>

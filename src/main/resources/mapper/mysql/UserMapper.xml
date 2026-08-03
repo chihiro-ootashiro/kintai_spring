@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapperとxmlのマッピング -->
+<mapper namespace="com.example.demo.repository.UserMapper">
+
+	<!-- SQL：ログインユーザ検索 -->
+	<select id="findByLoginId"
+		resultType="com.example.demo.domain.model.LoginUser">
+		SELECT
+		*
+		FROM
+		m_employee
+		WHERE
+		email = #{loginId}
+	</select>
+	
+	<!-- ユーザー一覧-->
+	<select id="findMany" resultMap="loginUser">
+		SELECT * FROM users WHERE 1 = 1
+		
+		<!--社員番号部分一致検索-->
+		<if test="employeeNo != null and employeeNo != ''">
+			AND employee_no LIKE CONCAT('%', #{employeeNo}, '%')
+		</if>
+		
+		<!-- 社員名部分一致検索-->
+		<if test="employeeName != null and employeeName != ''">
+			AND employee_name LIKE CONCAT('%', #{employeeName}, '%')
+		</if>
+		
+		<!--メアド部分一致検索-->
+		<if test="email != null and email != ''">
+			AND email LIKE CONCAT('%', #{email}, '%')
+		</if>
+		
+		<!--入社日検索-->
+		 <if test="startDate != null">
+            AND start_date = #{startDate}
+        </if>
+	</select>
+		
+</mapper>

@@ -5,13 +5,13 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: path.resolve(__dirname, "../main/resources/static"),
+    outDir: path.resolve(__dirname, "../main/resources/assets"),
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        entryFileNames: `assets/bundle.js`,
-        chunkFileNames: `assets/bundle.js`,
-        assetFileNames: `assets/bundle.[ext]`,
+        entryFileNames: `bundle.js`,
+        chunkFileNames: `bundle.js`,
+        assetFileNames: `bundle.[ext]`,
       },
     },
   },
