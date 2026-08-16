@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,6 +10,9 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+
+	@Autowired
+	private LoginHandler customLoginSuccessHandler;
 
 	/**
 	 * パスワードを暗号化用メソッド
@@ -27,8 +31,8 @@ public class SecurityConfig {
 				//ログイン認証処理URL
 				.loginProcessingUrl("/login")
 				.loginPage("/login")
-				//ログイン成功後の遷移先（勤怠管理画面に遷移）
-				.defaultSuccessUrl("/kintai/index", true)
+				//ログイン成功後の遷移先（ログインハンドラーで動的に遷移）
+				.successHandler(customLoginSuccessHandler)
 				//ログイン失敗後の遷移先
 				.failureUrl("/login/error")
 				//ログインフォームでのユーザIDとパスワードのname
@@ -42,11 +46,21 @@ public class SecurityConfig {
 						//今回は未認証時にユーザ登録画面への遷移を出来ないようにしてくださいなので（"/")は書かない
 						.requestMatchers("/css/**", "/js/**", "/assets/**", "/favicon.ico").permitAll()
 						// 認可用：権限が無いと利用できない
-						.requestMatchers("/kintai/employee/**", "/api/employee/**").hasRole("ADMIN") // 管理者(1)のみ	
-						.requestMatchers("/kintai/**").hasAnyRole("GENERAL", "ADMIN") // 全員(0と1)がアクセス可能
+						.requestMatchers("/employee/index").hasRole("ADMIN") // 社員マスタ画面は管理者(ADMIN)のみアクセス可能
+						.requestMatchers("/api/employee/create").hasRole("ADMIN")//登録は管理者のみ
+						.requestMatchers("/api/employee/update").hasRole("ADMIN")//登録は管理者のみ
+						.requestMatchers("/employee/input").hasAnyRole("GENERAL", "ADMIN") // 勤怠入力画面は全員がアクセス可能
 						// 他のリンクは全て認証が必要
-						.anyRequest().authenticated());
+						.anyRequest().authenticated())
+		
+						// 💡 【ここを追加！】Reactからの新規登録（create）の通信だけ、CSRFチェックを免除する
+						.csrf(csrf -> csrf
+								.ignoringRequestMatchers("/api/employee/create")
+								.ignoringRequestMatchers("/api/employee/update")
+								.ignoringRequestMatchers("/api/employee/delete/**" )
+								
+						); 
 
-		return http.build();
-	}
+				return http.build();
+			}
 }

@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.domain.model.LoginUser;
+import com.example.demo.domain.entity.LoginUser;
+import com.example.demo.form.EmployeeSearchForm;
 import com.example.demo.repository.UserMapper;
 
 @Service
@@ -27,7 +28,7 @@ public class LoginUserServiceImpl implements LoginUserService {
 	 * 社員一覧取得
 	 */
 	@Override
-	public List<LoginUser> getLoginUserList(LoginUser searchForm) {
+	public List<LoginUser> getLoginUserList(EmployeeSearchForm searchForm) {
 		return mapper.findMany(searchForm);
 	}
 	
@@ -37,21 +38,21 @@ public class LoginUserServiceImpl implements LoginUserService {
 //        return mapper.findOne(id);
 //    }
 //
-//    /** ③ 社員登録処理 */
-//    @Override
-//    public int createLoginUser(LoginUser loginUser) {
-//        return mapper.insertOne(loginUser);
-//    }
-//
-//    /** ④ 社員更新処理 */
-//    @Override
-//    public int updateLoginUser(LoginUser loginUser) {
-//        return mapper.updateOne(loginUser);
-//    }
-//
-//    /** ⑤ 社員削除処理 */
-//    @Override
-//    public int deleteLoginUser(LoginUser loginUser) {
-//        return mapper.deleteOne(loginUser);
-//    }
+    /** ③ 社員登録処理 */
+    @Override
+    public int createLoginUser(LoginUser loginUser) {
+        return mapper.insertOne(loginUser);
+    }
+
+    /** ④ 社員更新処理 */
+    @Override
+    public int updateLoginUser(LoginUser loginUser) {
+        return mapper.updateOne(loginUser);
+    }
+
+    /** ⑤ 社員削除処理 */
+    @Override
+    public int deleteLoginUser(String employeeNo) {
+    	 return mapper.deleteOne(employeeNo);
+    }
 }

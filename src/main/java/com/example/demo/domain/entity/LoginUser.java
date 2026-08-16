@@ -1,4 +1,4 @@
-package com.example.demo.domain.model;
+package com.example.demo.domain.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,4 +16,6 @@ public class LoginUser {
  private Integer roleCd;
  private LocalDateTime createdAt;
  private LocalDateTime updatedAt;
+ 
+ 
 }

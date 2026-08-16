@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.domain.model.LoginUser;
+import com.example.demo.domain.entity.LoginUser;
 import com.example.demo.domain.service.LoginUserService;
 
 @Service

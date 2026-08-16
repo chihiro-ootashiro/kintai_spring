@@ -5,9 +5,22 @@
 <!-- Mapperとxmlのマッピング -->
 <mapper namespace="com.example.demo.repository.UserMapper">
 
+	<resultMap type="com.example.demo.domain.entity.LoginUser"
+		id="loginUser">
+		<id column="id" property="id"></id>
+		<result column="employee_no" property="employeeNo"></result>
+		<result column="employee_name" property="employeeName"></result>
+		<result column="email" property="email"></result>
+		<result column="start_date" property="startDate"></result>
+		<result column="password" property="password"></result>
+		<result column="role_cd" property="roleCd"></result>
+		<result column="created_at" property="createdAt"></result>
+		<result column="updated_at" property="updatedAt"></result>
+	</resultMap>
+
+
 	<!-- SQL：ログインユーザ検索 -->
-	<select id="findByLoginId"
-		resultType="com.example.demo.domain.model.LoginUser">
+	<select id="findByLoginId" resultMap="loginUser">
 		SELECT
 		*
 		FROM
@@ -15,30 +28,85 @@
 		WHERE
 		email = #{loginId}
 	</select>
-	
-	<!-- ユーザー一覧-->
+
+	<!-- ユーザー一覧 -->
 	<select id="findMany" resultMap="loginUser">
-		SELECT * FROM users WHERE 1 = 1
-		
-		<!--社員番号部分一致検索-->
+		SELECT * FROM m_employee WHERE 1 = 1
+
+		<!--社員番号部分一致検索 -->
 		<if test="employeeNo != null and employeeNo != ''">
 			AND employee_no LIKE CONCAT('%', #{employeeNo}, '%')
 		</if>
-		
-		<!-- 社員名部分一致検索-->
+
+		<!-- 社員名部分一致検索 -->
 		<if test="employeeName != null and employeeName != ''">
 			AND employee_name LIKE CONCAT('%', #{employeeName}, '%')
 		</if>
-		
-		<!--メアド部分一致検索-->
+
+		<!--メアド部分一致検索 -->
 		<if test="email != null and email != ''">
 			AND email LIKE CONCAT('%', #{email}, '%')
 		</if>
-		
-		<!--入社日検索-->
-		 <if test="startDate != null">
-            AND start_date = #{startDate}
-        </if>
+
+		<!--入社日検索 -->
+		<if test="startDate != null and startDate != ''">
+			AND start_date = #{startDate}
+		</if>
+		<if test="roleCd != null">
+			AND role_cd = #{roleCd}
+		</if>
 	</select>
-		
+
+	<!-- 1件登録 -->
+	<insert id="insertOne">
+		INSERT INTO
+		m_employee (
+		employee_no,
+		employee_name,
+		email,
+		start_date,
+		password,
+		role_cd,
+		created_at,
+		updated_at
+		) VALUES (
+		#{employeeNo},
+		#{employeeName},
+		#{email},
+		#{startDate},
+		#{password},
+		#{roleCd},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<!--更新処理 -->
+	<update id="updateOne">
+
+	UPDATE
+		m_employee
+	<set>
+		employee_name = #{employeeName},
+		start_date = #{startDate},
+		role_cd =
+		#{roleCd},
+		updated_at = NOW(),
+
+		<if test="password != null and password != ''">
+			password = #{password}
+		</if>
+	</set>
+	WHERE
+		employee_no = #{employeeNo}
+	</update>
+	
+<!--削除-->
+<delete id="deleteOne">
+		DELETE FROM
+			m_employee
+		WHERE
+			employee_no = #{employeeNo}
+	</delete>
+
 </mapper>

@@ -1,30 +1,29 @@
 package com.example.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class LoginController {
 
-	@Autowired
-	HttpSession session;
-	
 	/**
-	* ログイン
-	*/
+	 * ログイン画面表示 (GET)
+	 * 
+	 */
 	@GetMapping("/login")
 	public String login() {
 		return "login/login";
 	}
-	
+
 	/**
-	* ログイン失敗時
-	*/
+	 * ログイン失敗時 (GET)
+	 * 
+	 */
 	@GetMapping("/login/error")
-	public String loginError() {
+	public String loginError(Model model) {
+		// 
+		model.addAttribute("message", "メールアドレスまたはパスワードが間違っています。");
 		return "login/login";
 	}
 }

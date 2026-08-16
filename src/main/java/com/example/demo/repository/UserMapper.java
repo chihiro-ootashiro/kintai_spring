@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.example.demo.domain.model.LoginUser;
+import com.example.demo.domain.entity.LoginUser;
+import com.example.demo.form.EmployeeSearchForm;
 
 @Mapper
 public interface UserMapper {
@@ -12,23 +13,20 @@ public interface UserMapper {
 	/**
 	 * ログインユーザ検索
 	 */
-
 	public LoginUser findByLoginId(String loginId);
 	
 	/*
 	 * 社員一覧取得
 	 */
-	public List<LoginUser>findMany(LoginUser searchForm);
+	public List<LoginUser>findMany(EmployeeSearchForm searchForm);
 	
-//	/** ② 1件詳細取得 */
-//    public LoginUser findOne(Integer id);
-//
-//    /** ③ 1件登録 */
-//    public int insertOne(LoginUser loginUser);
-//
-//    /** ④ 1件更新 */
-//    public int updateOne(LoginUser loginUser);
-//
-//    /** ⑤ 1件削除 */
-//    public int deleteOne(LoginUser loginUser);
+
+    /** 1件登録 */
+    public int insertOne(LoginUser loginUser);
+
+    /** 1件更新 */
+    public int updateOne(LoginUser loginUser);
+
+    /** 1件削除 */
+    public int deleteOne(String employeeNo);
 }
