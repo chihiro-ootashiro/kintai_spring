@@ -20,7 +20,7 @@
 					<!-- メールアドレス -->
 					<div class="mb-3">
 						<label for="mail" class="form-label">メールアドレス:</label>
-						<input type="email" class="form-control" id="login_id" name="login_id"
+						<input type="text" class="form-control" id="login_id" name="login_id"
 							th:classappend="${message} ? 'is-invalid'">
 
 						<p th:if="${message}" th:text="${message}" class="text-danger mt-1 mb-0"

@@ -24,4 +24,9 @@ public  interface LoginUserService {
 
     /** 社員削除処理 */
     public int deleteLoginUser(String employeeNo);
+    
+    /**
+	 * 社員番号から社員情報を1件取得
+	 */
+	public LoginUser getUserByEmployeeNo(String employeeNo);
 }

@@ -84,29 +84,39 @@
 	<!--更新処理 -->
 	<update id="updateOne">
 
-	UPDATE
+		UPDATE
 		m_employee
-	<set>
-		employee_name = #{employeeName},
-		start_date = #{startDate},
-		role_cd =
-		#{roleCd},
-		updated_at = NOW(),
+		<set>
+			employee_name = #{employeeName},
+			start_date = #{startDate},
+			role_cd =
+			#{roleCd},
+			updated_at = NOW(),
 
-		<if test="password != null and password != ''">
-			password = #{password}
-		</if>
-	</set>
-	WHERE
+			<if test="password != null and password != ''">
+				password = #{password}
+			</if>
+		</set>
+		WHERE
 		employee_no = #{employeeNo}
 	</update>
-	
-<!--削除-->
-<delete id="deleteOne">
+
+	<!--削除 -->
+	<delete id="deleteOne">
 		DELETE FROM
-			m_employee
+		m_employee
 		WHERE
-			employee_no = #{employeeNo}
+		employee_no = #{employeeNo}
 	</delete>
 
+	<!-- 社員番号から1件取得 -->
+	<select id="findByEmployeeNo" parameterType="String"
+		resultMap="loginUser">
+	SELECT
+		*
+	 FROM
+	 	m_employee
+	 WHERE
+	 	employee_no = #{employeeNo}
+	</select>
 </mapper>

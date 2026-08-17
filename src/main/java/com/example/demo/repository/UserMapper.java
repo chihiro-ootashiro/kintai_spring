@@ -29,4 +29,9 @@ public interface UserMapper {
 
     /** 1件削除 */
     public int deleteOne(String employeeNo);
+    
+    /**
+	 * 社員番号から社員情報を1件取得
+	 */
+	public LoginUser findByEmployeeNo(String employeeNo);
 }

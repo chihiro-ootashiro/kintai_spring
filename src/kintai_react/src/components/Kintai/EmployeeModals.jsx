@@ -13,6 +13,7 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
     const [pass, setPass] = useState('');
     const [lastPass, setLastPass] = useState('');
     const [roleCd, setroleCd] = useState('');
+    const [registerErrors, setRegisterErrors] = useState([]);
 
     // ==========================================
     // 2. 更新モーダル用の State
@@ -23,6 +24,7 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
     const [updateRoleCd, setUpdateRoleCd] = useState('');
     const [updatePass, setUpdatePass] = useState('');
     const [updateConfirmPass, setUpdateConfirmPass] = useState('');
+    const [updateErrors, setUpdateErrors] = useState([]);
 
     // ラジオボタンで選ばれた人が変わったら、自動的に更新欄にその人のデータをセットする仕組み
     useEffect(() => {
@@ -39,8 +41,12 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
     // ==========================================
     // 新規登録
     const handleRegister = async () => {
+        // 💡 処理開始時に以前のエラー表示をクリア
+        setRegisterErrors([]);
+
         if (pass !== lastPass) {
-            alert("パスワードと確認用パスワードが一致しません");
+            // 💡 更新時とUXを統一するため、アラートエリアに表示します
+            setRegisterErrors(["パスワードと確認用パスワードが一致しません"]);
             return;
         }
 
@@ -77,17 +83,28 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                 //親コンポーネントの一覧をリフレッシュして、登録した社員番号で自動検索をかける
                 if (onRefreshList) onRefreshList(num);
             } else {
-                alert("登録に失敗しました");
+                // 💡 Javaの BindingResult から返ってきたエラーメッセージ配列を取得
+                const resData = await response.json();
+                if (Array.isArray(resData)) {
+                    setRegisterErrors(resData); // 配列ごとStateに格納
+                } else {
+                    setRegisterErrors(["登録に失敗しました"]);
+                }
             }
         } catch (err) {
             console.error("登録通信エラー", err);
+            setRegisterErrors(["通信エラーが発生しました"]);
         }
     };
 
-    //更新処理
+
+    // 更新処理
     const handleUpdate = async () => {
+        // 💡 処理開始時に以前のエラー表示をクリア
+        setUpdateErrors([]);
+
         if (updatePass !== updateConfirmPass) {
-            alert("パスワードと確認用パスワードが一致しません");
+            setUpdateErrors(["パスワードと確認用パスワードが一致しません"]);
             return;
         }
 
@@ -101,14 +118,13 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                 roleCd: updateRoleCd
             };
 
-            console.log("★Javaに送る直前のデータ:", form);
-
             const option = {
                 method: "PATCH",
                 credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
             };
+
             const response = await fetch("/api/employee/update", option);
             if (response.ok) {
                 alert("社員情報を更新しました");
@@ -116,16 +132,21 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                 const modal = window.bootstrap?.Modal.getInstance(modalEl);
                 if (modal) modal.hide();
 
-                // パスワード入力欄をクリア
                 setUpdatePass('');
                 setUpdateConfirmPass('');
-
                 if (onRefreshList) onRefreshList(selectedEmployee?.employeeNo);
             } else {
-                alert("更新に失敗しました");
+                // 💡 Javaの BindingResult から返ってきたエラーメッセージ配列を取得
+                const resData = await response.json();
+                if (Array.isArray(resData)) {
+                    setUpdateErrors(resData); // 配列ごとStateに格納
+                } else {
+                    setUpdateErrors(["更新に失敗しました"]);
+                }
             }
         } catch (err) {
             console.error("更新通信エラー", err);
+            setUpdateErrors(["通信エラーが発生しました"]);
         }
     };
 
@@ -162,9 +183,20 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                         <div className="modal-body">
                             <div className="card shadow-sm">
                                 <div className="card-header bg-light"><span>社員情報</span></div>
+
+                                {registerErrors.length > 0 && (
+                                    <div className="alert alert-danger mx-3 mt-3 mb-0 py-2 px-3">
+                                        <ul className="mb-0 ps-3">
+                                            {registerErrors.map((msg, idx) => (
+                                                <li key={idx}>{msg}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
                                 <div className="card-body">
                                     <div className="row g-3 align-items-end">
-                                        <div className="col-4">
+                                        <div className="col-3">
                                             <label className="form-label">社員番号:</label>
                                             <input type="text" className="form-control" value={num} onChange={(e) => setNum(e.target.value)} />
                                         </div>
@@ -172,20 +204,20 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                                             <label className="form-label">社員名:</label>
                                             <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} />
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-3">
                                             <label className="form-label">入社日:</label>
                                             <input type="date" className="form-control" value={date} onChange={(e) => setDate(e.target.value)} />
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-2">
                                             <label className="form-label">権限:</label>
                                             <select
                                                 className="form-control"
                                                 value={roleCd}
                                                 onChange={(e) => setroleCd(e.target.value)}
                                             >
-                                                <option value="">選択してください</option>
+                                                <option value=""></option>
                                                 <option value="1">管理者</option>
-                                                <option value="0">一般社員</option>
+                                                <option value="0">一般</option>
                                             </select>
                                         </div>
                                         <div className="col-4">
@@ -221,6 +253,16 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                             <h5 className="modal-title">社員情報更新</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
+
+                        {updateErrors.length > 0 && (
+                            <div className="alert alert-danger mx-3 mt-3 mb-0 py-2 px-3">
+                                <ul className="mb-0 ps-3">
+                                    {updateErrors.map((msg, idx) => (
+                                        <li key={idx}>{msg}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                         <div className="modal-body">
                             <div className="card shadow-sm">
                                 <div className="card-header bg-light">
@@ -228,7 +270,7 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                                 </div>
                                 <div className="card-body">
                                     <div className="row g-3 align-items-end">
-                                        <div className="col-4">
+                                        <div className="col-3">
                                             <label className="form-label">社員番号:</label>
                                             <input type="text" className="form-control" value={selectedEmployee?.employeeNo || ''} />
                                         </div>
@@ -236,21 +278,21 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                                             <label className="form-label">社員名:</label>
                                             <input type="text" className="form-control" value={updateName} onChange={(e) => setUpdateName(e.target.value)} />
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-3">
                                             <label className="form-label">入社日:</label>
                                             <input type="date" className="form-control" value={updateDate} onChange={(e) => setUpdateDate(e.target.value)} />
                                         </div>
-                                        <div className="col-4">
+                                        <div className="col-2">
                                             <label className="form-label">権限:</label>
                                             <select className="form-control" value={updateRoleCd} onChange={(e) => setUpdateRoleCd(e.target.value)}>
-                                                <option value="">選択してください</option>
+                                                <option value=""></option>
                                                 <option value="1">管理者</option>
-                                                <option value="0">一般社員</option>
+                                                <option value="0">一般</option>
                                             </select>
                                         </div>
                                         <div className="col-4">
                                             <label className="form-label">メールアドレス:</label>
-                                            <input type="text" className="form-control" value={updateMail} onChange={(e) => setUpdateMail(e.target.value)} readOnly />
+                                            <input type="text" className="form-control" value={updateMail} onChange={(e) => setUpdateMail(e.target.value)} disabled />
                                         </div>
                                         <div className="col-4">
                                             <label className="form-label">パスワード:</label>

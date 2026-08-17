@@ -55,4 +55,9 @@ public class LoginUserServiceImpl implements LoginUserService {
     public int deleteLoginUser(String employeeNo) {
     	 return mapper.deleteOne(employeeNo);
     }
+    
+	@Override
+	public LoginUser getUserByEmployeeNo(String employeeNo) {
+		return mapper.findByEmployeeNo(employeeNo);
+	}
 }

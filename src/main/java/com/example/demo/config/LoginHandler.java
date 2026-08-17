@@ -25,8 +25,8 @@ public class LoginHandler implements AuthenticationSuccessHandler {
 		// 分岐
 		if (roles.contains("ROLE_ADMIN")) {
 			// 管理ユーザの場合：いったん社員マスタ画面に
-			// 勤怠管理画面ができたら、ここをそのURL（例: "/admin/attendance"）に書き換える
-			response.sendRedirect("/employee/index");
+			// 勤怠管理画面ができたら、ここを書き換える
+			response.sendRedirect("/attendance/list");
 		} else {
 			// 一般ユーザの場合：勤怠入力画面に遷移させます
 			response.sendRedirect("/employee/input");
