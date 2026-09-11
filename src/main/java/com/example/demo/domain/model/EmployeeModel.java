@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class EmployeeModel {
+	private Integer id;
 	private String employeeNo;
 	private String employeeName;
 	private String email;

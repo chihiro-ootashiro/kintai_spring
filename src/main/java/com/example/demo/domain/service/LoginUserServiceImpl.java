@@ -32,25 +32,20 @@ public class LoginUserServiceImpl implements LoginUserService {
 		return mapper.findMany(searchForm);
 	}
 	
-//	 /** ② 社員詳細取得 */
-//    @Override
-//    public LoginUser getLoginUser(Integer id) {
-//        return mapper.findOne(id);
-//    }
-//
-    /** ③ 社員登録処理 */
+
+    /** 社員登録処理 */
     @Override
     public int createLoginUser(LoginUser loginUser) {
         return mapper.insertOne(loginUser);
     }
 
-    /** ④ 社員更新処理 */
+    /** 社員更新処理 */
     @Override
     public int updateLoginUser(LoginUser loginUser) {
         return mapper.updateOne(loginUser);
     }
 
-    /** ⑤ 社員削除処理 */
+    /** 社員削除処理 */
     @Override
     public int deleteLoginUser(String employeeNo) {
     	 return mapper.deleteOne(employeeNo);

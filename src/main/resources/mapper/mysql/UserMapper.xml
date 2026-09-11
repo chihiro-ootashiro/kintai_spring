@@ -33,9 +33,9 @@
 	<select id="findMany" resultMap="loginUser">
 		SELECT * FROM m_employee WHERE 1 = 1
 
-		<!--社員番号部分一致検索 -->
+		<!--社員番号前方一致検索 -->
 		<if test="employeeNo != null and employeeNo != ''">
-			AND employee_no LIKE CONCAT('%', #{employeeNo}, '%')
+			AND employee_no LIKE CONCAT(#{employeeNo}, '%')
 		</if>
 
 		<!-- 社員名部分一致検索 -->
@@ -43,9 +43,9 @@
 			AND employee_name LIKE CONCAT('%', #{employeeName}, '%')
 		</if>
 
-		<!--メアド部分一致検索 -->
+		<!--メアド前方一致検索 -->
 		<if test="email != null and email != ''">
-			AND email LIKE CONCAT('%', #{email}, '%')
+			AND email LIKE CONCAT(#{email}, '%')
 		</if>
 
 		<!--入社日検索 -->
@@ -87,10 +87,10 @@
 		UPDATE
 		m_employee
 		<set>
+			employee_no = #{employeeNo},
 			employee_name = #{employeeName},
 			start_date = #{startDate},
-			role_cd =
-			#{roleCd},
+			role_cd = #{roleCd},
 			updated_at = NOW(),
 
 			<if test="password != null and password != ''">
@@ -98,7 +98,7 @@
 			</if>
 		</set>
 		WHERE
-		employee_no = #{employeeNo}
+			id = #{id}
 	</update>
 
 	<!--削除 -->
@@ -112,11 +112,11 @@
 	<!-- 社員番号から1件取得 -->
 	<select id="findByEmployeeNo" parameterType="String"
 		resultMap="loginUser">
-	SELECT
+		SELECT
 		*
-	 FROM
-	 	m_employee
-	 WHERE
-	 	employee_no = #{employeeNo}
+		FROM
+		m_employee
+		WHERE
+		employee_no = #{employeeNo}
 	</select>
 </mapper>

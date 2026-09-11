@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.repository.HolidayMapper">
+
+	<!-- 既存の記述に合わせてresultMapを定義 -->
+	<resultMap type="com.example.demo.domain.entity.Holiday"
+		id="holidayResult">
+		<id property="id" column="id" />
+		<result property="holidayDate" column="yyyymmdd" />
+		<result property="holidayName" column="holiday_name" />
+		<result property="createdAt" column="created_at" />
+		<result property="updatedAt" column="updated_at" />
+	</resultMap>
+
+	<!-- 検索条件の共通部品 -->
+	<sql id="searchConditions">
+		<where>
+			<if test="date != null and date != ''">
+				AND yyyymmdd = #{date}
+			</if>
+			<if test="holidayName != null and holidayName != ''">
+				AND holiday_name LIKE CONCAT('%', #{holidayName}, '%')
+			</if>
+		</where>
+	</sql>
+
+	<!-- 検索を実行（resultMap="holidayResult" を使用する形式に変更） -->
+	<select id="selectByConditions" resultMap="holidayResult">
+		SELECT
+		id,
+		yyyymmdd,
+		holiday_name,
+		created_at,
+		updated_at
+		FROM
+		m_holiday
+		<include refid="searchConditions" />
+		ORDER BY yyyymmdd ASC
+		LIMIT #{size} OFFSET #{offset}
+	</select>
+
+	<!-- 総件数をカウント -->
+	<select id="countByConditions" resultType="long">
+		SELECT COUNT(*) FROM m_holiday
+		<include refid="searchConditions" />
+	</select>
+
+	<!-- 1件登録 -->
+	<insert id="insertOne" useGeneratedKeys="true" keyProperty="id">
+	INSERT INTO
+		m_holiday (
+		yyyymmdd,
+		holiday_name,
+		created_at,
+		updated_at
+	) VALUES (
+		#{holidayDate},
+		#{holidayName},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+
+	<!-- 1件取得（更新用の詳細取得） -->
+	<select id="selectOne" resultMap="holidayResult">
+		SELECT
+		id,
+		yyyymmdd,
+		holiday_name,
+		created_at,
+		updated_at
+		FROM
+		m_holiday
+		WHERE
+		id = #{id}
+	</select>
+
+	<!-- 1件更新 -->
+	<update id="updateOne">
+		UPDATE
+		m_holiday
+		SET
+		yyyymmdd = #{holidayDate},
+		holiday_name = #{holidayName},
+		updated_at = NOW()
+		WHERE
+		id = #{id}
+	</update>
+
+<delete id="deleteOne" parameterType="int">
+DELETE FROM
+	m_holiday
+WHERE
+	id = #{id}
+</delete>
+
+</mapper>

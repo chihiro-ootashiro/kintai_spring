@@ -2,6 +2,7 @@ package com.example.demo.controller.api;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -78,12 +79,30 @@ public class EmployeeRestController {
 	 */
 	@PostMapping("/create")
 	public ResponseEntity<?> registerEmployee(
-			@RequestBody @Validated EmployeeCreateForm createForm, // 💡 @Validated を付与
-			BindingResult bindingResult) { // 💡 チェック結果を受け取るオブジェクトを追加
+			@RequestBody @Validated EmployeeCreateForm createForm,
+			BindingResult bindingResult) {
 
-		// 💡 単体バリデーションチェック（Formに設定した必須や形式などのエラーを検出）
+
+		// バリデーションチェックpass一致確認
+		if (!Objects.equals(createForm.getPassword(), createForm.getLastPass())) {
+			bindingResult.rejectValue("lastPass", "NotMatch", "パスワードと確認用パスワードが一致しません");
+		}
+		// 社員番号の重複チェック
+		LoginUser checkNo = loginUserService.getUserByEmployeeNo(createForm.getEmployeeNo());
+		if (checkNo != null) {
+			bindingResult.rejectValue("employeeNo", "Duplicate", "この社員番号は既に登録されています");
+		}
+
+		// メールアドレスの重複チェック
+		String emailKey = createForm.getEmail();
+		LoginUser checkEmail = loginUserService.getUserByLoginId(emailKey);
+		if (checkEmail != null) {
+			bindingResult.rejectValue("email", "Duplicate", "このメールアドレスは既に登録されています");
+		}
+
+		// バリデーションチェック
 		if (bindingResult.hasErrors()) {
-			// エラーメッセージをリストにまとめて、フロント（React）へ 400 Bad Request で返却
+			// エラーメッセージをリストにまとめてReactへ 400 Bad Request で返却
 			List<String> errors = bindingResult.getAllErrors().stream()
 					.map(error -> error.getDefaultMessage())
 					.collect(Collectors.toList());
@@ -91,29 +110,16 @@ public class EmployeeRestController {
 		}
 
 		try {
-			// 社員番号の重複チェック
-			LoginUser checkNo = loginUserService.getUserByEmployeeNo(createForm.getEmployeeNo());
-			if (checkNo != null) {
-				return ResponseEntity.badRequest().body(List.of("この社員番号は既に登録されています"));
-			}
-
-			// メールアドレスの重複チェック
-			String emailKey = createForm.getEmail();
-			LoginUser checkEmail = loginUserService.getUserByLoginId(emailKey);
-			if (checkEmail != null) {
-				return ResponseEntity.badRequest().body(List.of("このメールアドレスは既に登録されています"));
-			}
-
 			// パスワードを暗号化（ハッシュ化）する
 			String hashedPassword = passwordEncoder.encode(createForm.getPassword());
 
-			//  登録用のエンティティ（LoginUser）を新しく組み立てる
+			//  登録用のエンティティを新しく組み立てる
 			LoginUser newUser = new LoginUser();
 			newUser.setEmployeeNo(createForm.getEmployeeNo());
 			newUser.setEmployeeName(createForm.getEmployeeName());
 			newUser.setEmail(createForm.getEmail());
 
-			// 💡 String型の入社日を LocalDate に変換してセット
+			// String型の入社日を LocalDate に変換してセット
 			newUser.setStartDate(LocalDate.parse(createForm.getStartDate()));
 
 			newUser.setPassword(hashedPassword);
@@ -125,7 +131,9 @@ public class EmployeeRestController {
 			// Reactへ（200 OK）を返す
 			return ResponseEntity.ok("Success");
 
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 			return ResponseEntity
 					.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -139,6 +147,11 @@ public class EmployeeRestController {
 	public ResponseEntity<?> updateEmployee(
 			@RequestBody @Validated EmployeeUpdateForm updateForm,
 			BindingResult bindingResult) {
+
+		//パスワード一致確認
+		if (!java.util.Objects.equals(updateForm.getPassword(), updateForm.getConfirmPass())) {
+			bindingResult.rejectValue("confirmPass", "NotMatch", "パスワードと確認用パスワードが一致しません");
+		}
 
 		// バリデーションチェック
 		if (bindingResult.hasErrors()) {
@@ -161,10 +174,12 @@ public class EmployeeRestController {
 			// 画面から入力された社員番号で、すでにDBにいるか検索してみる
 			LoginUser checkNo = loginUserService.getUserByEmployeeNo(updateForm.getEmployeeNo());
 
-			// DBにデータが存在かつそのデータの主キー(id)が、今の自分の主キー(id)とは違う他人の番号と被っているのでエラー
+			// DBにデータが存在かつそのデータの主キーが、今の自分の主キーとは違う他人の番号と被っているのでエラー
 			if (checkNo != null && !checkNo.getId().equals(employee.getId())) {
 				return ResponseEntity.badRequest().body(List.of("この社員番号は既に他の社員に割り当てられています"));
 			}
+
+			employee.setEmployeeNo(updateForm.getEmployeeNo());
 
 			// 正常に見つかった場合は、if文の外側（ここ）で各項目を更新
 			employee.setEmployeeName(updateForm.getEmployeeName());
@@ -188,6 +203,8 @@ public class EmployeeRestController {
 				// パスワードが入力されていない場合はnullにして上書きしないようにする
 				employee.setPassword(null);
 			}
+
+			employee.setId(updateForm.getId());
 
 			// サービスメソッドを呼び出してデータベースを更新
 			loginUserService.updateLoginUser(employee);

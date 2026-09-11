@@ -68,6 +68,17 @@ export default function EmployeeMaster() {
         setEmployeeList(json || []);
         setCurrentPage(1); // 検索したときは1ページ目に戻す
 
+        // 新しく取得した一覧データから、自動選択された社員の最新データを探して上書きする
+        if (json && json.length > 0 && targetNum) {
+          // 新しく取得したリストの中から、新しく登録した社員番号の人を探す
+          const latestData = json.find(e => e.employeeNo === targetNum);
+
+          if (latestData) {
+            // 見つかったら、その本当に最新のデータで選択状態を上書きする
+            setSelectedEmployee(latestData);
+          }
+        }
+
         // 検索結果が0件だった場合は警告を出す
         if (!json || json.length === 0) {
           if (alertPlaceholder) alertPlaceholder.style.display = "block";
@@ -98,6 +109,7 @@ export default function EmployeeMaster() {
     setSearchDate("");
     setSearchRole("");
     setErrors({});
+    setCurrentPage(1);
   };
 
 
@@ -158,11 +170,11 @@ export default function EmployeeMaster() {
             </div>
             <div className="col-2">
               <label htmlFor="searchRole" className="form-label">権限：</label>
-              <select id="searchRole" name="searchRole" className="form-control"
+              <select id="searchRole" name="searchRole" className="form-select"
                 value={searchRole} onChange={(e) => setSearchRole(e.target.value)} >
                 <option value=""></option>
-                <option value="0">一般ユーザ</option>
-                <option value="1">管理ユーザ</option>
+                <option value="0">一般</option>
+                <option value="1">管理者</option>
               </select>
             </div>
           </div>
@@ -233,23 +245,21 @@ export default function EmployeeMaster() {
           </div>
 
           {/* ページネーション */}
-          {totalPages > 1 && (
-            <nav className="mt-3">
-              <ul className="pagination justify-content-center mb-0">
-                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                  <button className="page-link" onClick={() => paginate(currentPage - 1)} type="button">前へ</button>
+          <nav className="mt-3">
+            <ul className="pagination justify-content-center mb-0">
+              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <button className="page-link" onClick={() => paginate(currentPage - 1)} type="button">前</button>
+              </li>
+              {[...Array(totalPages || 1)].map((_, i) => (
+                <li key={i + 1} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                  <button className="page-link" onClick={() => paginate(i + 1)} type="button">{i + 1}</button>
                 </li>
-                {[...Array(totalPages)].map((_, i) => (
-                  <li key={i + 1} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                    <button className="page-link" onClick={() => paginate(i + 1)} type="button">{i + 1}</button>
-                  </li>
-                ))}
-                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                  <button className="page-link" onClick={() => paginate(currentPage + 1)} type="button">次へ</button>
-                </li>
-              </ul>
-            </nav>
-          )}
+              ))}
+              <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? "disabled" : ""}`}>
+                <button className="page-link" onClick={() => paginate(currentPage + 1)} type="button">次</button>
+              </li>
+            </ul>
+          </nav>
 
         </div>
       </div>

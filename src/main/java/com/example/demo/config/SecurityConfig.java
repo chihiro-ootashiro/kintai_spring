@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 public class SecurityConfig {
@@ -50,17 +52,16 @@ public class SecurityConfig {
 						.requestMatchers("/api/employee/create").hasRole("ADMIN")//登録は管理者のみ
 						.requestMatchers("/api/employee/update").hasRole("ADMIN")//登録は管理者のみ
 						.requestMatchers("/employee/input").hasAnyRole("GENERAL", "ADMIN") // 勤怠入力画面は全員がアクセス可能
+						.requestMatchers("/attendance/**").hasRole("ADMIN")//勤怠管理画面は管理者のみ
+						.requestMatchers("/holiday/**").hasRole("ADMIN")//祝日マスタは管理者のみ
 						// 他のリンクは全て認証が必要
 						.anyRequest().authenticated())
-		
-						// 💡 【ここを追加！】Reactからの新規登録（create）の通信だけ、CSRFチェックを免除する
-						.csrf(csrf -> csrf
-								.ignoringRequestMatchers("/api/employee/create")
-								.ignoringRequestMatchers("/api/employee/update")
-								.ignoringRequestMatchers("/api/employee/delete/**" )
-								
-						); 
 
-				return http.build();
-			}
+				.csrf(csrf -> csrf
+						.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+						// ヘッダーの「X-XSRF-TOKEN」をそのまま正しく検証させるための指定
+						.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()));
+
+		return http.build();
+	}
 }
