@@ -17,7 +17,7 @@ function toggleActionButtons() {
 }
 
 /**
- * 選択されたラジオボタンと、その行（tr）の要素を取得する共通の補助関数
+ * 選択されたラジオボタンと、その行の要素を取得する共通の補助関数
  * @returns { {radio: HTMLInputElement, row: HTMLTableRowElement} | null }
  */
 function getSelectedRowData() {
@@ -37,10 +37,10 @@ function getSelectedRowData() {
 	};
 }
 
-// 画面読み込み時の処理（エラーチェックと各イベント設定）
+// 画面読み込み時の処理　エラーチェックと各イベント設定
 document.addEventListener('DOMContentLoaded', () => {
 
-	// 0. 初期状態のボタン制御 ＆ ラジオボタン変更時のイベントリスナー登録
+	// 初期状態のボタン制御 ＆ ラジオボタン変更時のイベントリスナー登録
 	toggleActionButtons();
 	const form = document.getElementById('actionForm');
 	if (form) {
@@ -51,31 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// 1. エラー発生時に自動で該当のモーダルを開く処理
-	const scriptTag = document.getElementById('holiday-script');
-	if (scriptTag) {
-		const hasErrors = scriptTag.getAttribute('data-has-errors') === 'true';
-
-		if (hasErrors) {
-			// バックエンド側から「どの処理でエラーが起きたか」の識別子（'sinki', 'koushin', 'sakuzyo' など）を
-			// data-error-type 属性などで追加で受け取れるようにすると確実です。
-			const errorType = scriptTag.getAttribute('data-error-type') || 'sinki';
-
-			// エラーの種類に応じたモーダル要素を取得する
-			const targetModalEl = document.getElementById(`${errorType}-modal`);
-
-			if (targetModalEl) {
-				const errorModal = new bootstrap.Modal(targetModalEl);
-				errorModal.show();
-			}
-		}
-	}
-
-
-	// 2. 更新処理
+	// 更新処理
 	const koushinModal = document.getElementById('koushin-modal');
 	if (koushinModal) {
 		koushinModal.addEventListener('show.bs.modal', (event) => {
+
+			if (!event.relatedTarget) return;
+
 			const rowData = getSelectedRowData();
 			if (!rowData) {
 				event.preventDefault();
@@ -99,10 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// 3. 削除処理
+	// 削除処理
 	const sakuzyoModal = document.getElementById('sakuzyo-modal');
 	if (sakuzyoModal) {
 		sakuzyoModal.addEventListener('show.bs.modal', (event) => {
+
+			if (!event.relatedTarget) return;
+
 			const rowData = getSelectedRowData();
 			if (!rowData) {
 				event.preventDefault();
@@ -118,10 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 	}
-});
 
-document.addEventListener("DOMContentLoaded", function() {
-	// HTMLに埋め込んだ errorType の値を取得
+	// エラー時のモーダル再表示処理
 	const errorType = document.getElementById("errorType")?.value;
 
 	if (errorType === "register") {
@@ -132,53 +115,5 @@ document.addEventListener("DOMContentLoaded", function() {
 		// 更新モーダルを自動で開く
 		const koushinModal = new bootstrap.Modal(document.getElementById("koushin-modal"));
 		koushinModal.show();
-	}
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-	// HTMLに埋め込んだ errorType の値を取得
-	const errorType = document.getElementById("errorType")?.value;
-
-	if (errorType === "register") {
-		// 新規登録モーダルを自動で開く
-		const sinkiModal = new bootstrap.Modal(document.getElementById("sinki-modal"));
-		sinkiModal.show();
-	} else if (errorType === "update") {
-		// 更新モーダルを自動で開く
-		const koushinModal = new bootstrap.Modal(document.getElementById("koushin-modal"));
-		koushinModal.show();
-	}
-
-	document.addEventListener("DOMContentLoaded", function() {
-		// HTMLに埋め込んだ errorType の値を取得
-		const errorType = document.getElementById("errorType")?.value;
-
-		if (errorType === "register") {
-			// 新規登録モーダルを自動で開く
-			const sinkiModal = new bootstrap.Modal(document.getElementById("sinki-modal"));
-			sinkiModal.show();
-		} else if (errorType === "update") {
-			// 更新モーダルを自動で開く
-			const koushinModal = new bootstrap.Modal(document.getElementById("koushin-modal"));
-			koushinModal.show();
-		}
-	});
-
-	// ==========================================
-	// ★ 修正：成功フラグがあり、かつ検索条件が入っていれば再検索
-	// ==========================================
-	if (successType === "register" || successType === "update" || successType === "delete") {
-		const searchDate = document.getElementById('date');
-		const searchName = document.getElementById('holidayName');
-
-		const hasDate = searchDate && searchDate.value.trim() !== '';
-		const hasName = searchName && searchName.value.trim() !== '';
-
-		if (hasDate || hasName) {
-			const searchForm = document.querySelector('form[action*="/holiday/list"][method="get"]');
-			if (searchForm) {
-				searchForm.submit();
-			}
-		}
 	}
 });

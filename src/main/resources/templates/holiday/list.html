@@ -188,7 +188,8 @@
 	<!-- 祝日更新モーダル -->
 	<div class="modal fade" id="koushin-modal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-xl">
-			<form th:action="@{/holiday/update}" method="post" class="modal-content">
+			<!-- th:object="${holiday}" を追加 -->
+			<form th:action="@{/holiday/update}" th:object="${holiday}" method="post" class="modal-content">
 				<!-- モーダルヘッダー -->
 				<div class="modal-header bg-info text-white">
 					<h5 class="modal-title">祝日更新</h5>
@@ -204,17 +205,24 @@
 						</div>
 
 						<div class="row g-4 align-items-center">
-							<input type="hidden" id="editHolidayId" name="id" value="" />
+							<!-- th:field="*{id}" に変更 -->
+							<input type="hidden" id="editHolidayId" th:field="*{id}" />
 
-							<!-- 日付入力 -->
+							<!-- 日付入力 (th:field とエラー表示を追加) -->
 							<div class="col-md-3">
 								<label class="form-label">日付：</label>
-								<input type="date" id="editHolidayDate" name="holidayDate" class="form-control" />
+								<input type="date" id="editHolidayDate" th:field="*{holidayDate}" class="form-control"
+									th:errorclass="is-invalid" />
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('holidayDate')}"
+									th:errors="*{holidayDate}"></div>
 							</div>
-							<!-- 祝日名入力 -->
+							<!-- 祝日名入力 (th:field とエラー表示を追加) -->
 							<div class="col-md-4">
 								<label class="form-label">祝日名：</label>
-								<input type="text" id="editHolidayName" name="holidayName" class="form-control" />
+								<input type="text" id="editHolidayName" th:field="*{holidayName}" class="form-control"
+									th:errorclass="is-invalid" />
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('holidayName')}"
+									th:errors="*{holidayName}"></div>
 							</div>
 						</div>
 					</div>
@@ -228,9 +236,6 @@
 			</form>
 		</div>
 	</div>
-
-
-
 
 	<!-- 祝日削除モーダル -->
 	<div class="modal fade" id="sakuzyo-modal" tabindex="-1" aria-hidden="true">

@@ -26,7 +26,7 @@ public class HolidayController {
 	private HolidayService holidayService;
 
 	/**
-	* 勤怠管理画面のURL
+	* 祝日マスタ画面のURL
 	*/
 	@GetMapping("/list")
 	public String holidayMaster(@ModelAttribute HolidaySearchForm form, Model model) {
@@ -44,7 +44,7 @@ public class HolidayController {
 		// 画面へデータを渡す
 		model.addAttribute("holidayList", holidayList);
 		model.addAttribute("totalPages", totalPages);
-		// BindingResultのエラーを初期登録フォームに引き継ぐため、存在しない場合のみ新規オブジェクトを生成
+		// BindingResultのエラー表示
 		if (!model.containsAttribute("holiday")) {
 			model.addAttribute("holiday", new Holiday());
 		}
@@ -74,7 +74,7 @@ public class HolidayController {
 
 		if (bindingResult.hasErrors()) {
 			//Spring標準のキー名でエラーを渡す
-			redirectAttributes.addFlashAttribute("BindingResult.holiday", bindingResult);
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.holiday", bindingResult);
 			redirectAttributes.addFlashAttribute("holiday", holiday);
 			//画面側に errorType として "register" を渡す
 			redirectAttributes.addFlashAttribute("errorType", "register");
@@ -92,14 +92,6 @@ public class HolidayController {
 	@GetMapping("/edit")
 	public String editHoliday(@RequestParam("id") Integer id, Model model) {
 
-		// バリデーションエラーからのリダイレクトで既にデータがある場合は、何もしない
-		if (!model.containsAttribute("holiday")) {
-			// idをもとに情報を一件分取得
-			Holiday holiday = holidayService.selectOne(id);
-			// 更新画面にデータ渡す
-			model.addAttribute("holiday", holiday);
-		}
-
 		return "holiday/edit";
 	}
 
@@ -111,12 +103,14 @@ public class HolidayController {
 			@Validated @ModelAttribute Holiday holiday,
 			BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
-
+		
 		if (bindingResult.hasErrors()) {
-			redirectAttributes.addFlashAttribute("BindingResult.holiday", bindingResult);
+			// Spring標準のキー名でエラーと入力値を引き継ぐ
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.holiday", bindingResult);
 			redirectAttributes.addFlashAttribute("holiday", holiday);
+			// 画面側に errorType として "update" を渡す
 			redirectAttributes.addFlashAttribute("errorType", "update");
-			return "redirect:/holiday/edit?id=" + holiday.getId();
+			return "redirect:/holiday/list";
 		}
 
 		holidayService.updateHoliday(holiday);
