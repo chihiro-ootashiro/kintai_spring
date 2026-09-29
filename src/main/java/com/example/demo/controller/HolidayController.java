@@ -36,11 +36,10 @@ public class HolidayController {
 			Model model,
 			HttpSession session) {
 
-		// 1. クリア処理からリダイレクトされてきたか判定
+		//  クリア処理からリダイレクトされてきたか判定
 		boolean isClearAction = model.containsAttribute("isClearAction");
 
 		if (isClearAction) {
-			// 【クリア時】
 			// セッションから直前の検索条件を取得
 			HolidaySearchForm savedForm = (HolidaySearchForm) session.getAttribute("savedHolidaySearchForm");
 			if (savedForm != null) {
@@ -59,13 +58,13 @@ public class HolidayController {
 				executeHolidaySearch(form, model);
 			}
 
-			// 画面（テキストボックス）に渡すフォームは「空（ただしページ番号は維持）」にする
+			// 画面に渡すフォームは空（ページ番号は維持）にする
 			HolidaySearchForm emptyForm = new HolidaySearchForm();
 			emptyForm.setPage(form.getPage());
 			model.addAttribute("holidaySearchForm", emptyForm);
 
 		} else {
-			// 【通常の検索時（ボタン押下時など）】
+			// 通常の検索時　ボタン押下時など
 			// 現在の検索条件をセッションに保存（次回クリア時に使うため）
 			session.setAttribute("savedHolidaySearchForm", form);
 
@@ -81,7 +80,7 @@ public class HolidayController {
 	}
 
 	/**
-	 * 共通の検索・ページング処理（コードの重複を避けるためのプライベートメソッド）
+	 * 共通の検索・ページング処理
 	 */
 	private void executeHolidaySearch(HolidaySearchForm form, Model model) {
 		List<Holiday> holidayList = holidayService.getHolidayList(form);
@@ -104,10 +103,10 @@ public class HolidayController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			RedirectAttributes redirectAttributes) {
 
-		// 1. 画面の入力欄を空にするためのフラグをフラッシュ属性にセット
+
 		redirectAttributes.addFlashAttribute("isClearAction", true);
 
-		// 2. 現在のページ番号はそのまま引き継ぐ（URLパラメータとして付与）
+		//現在のページ番号はそのまま引き継ぐ
 		redirectAttributes.addAttribute("page", page);
 
 		return "redirect:/holiday/list";
@@ -151,7 +150,7 @@ public class HolidayController {
 			@RequestParam(value = "searchPage", defaultValue = "1") int searchPage,
 			RedirectAttributes redirectAttributes) {
 
-		// 現在の検索条件をリダイレクト先のクエリパラメータに付与
+		// 現在の検索条件をリダイレクト先のクエリパラメータにつける
 		addSearchParamAttributes(redirectAttributes, searchDate, searchHolidayName, searchPage);
 
 		if (bindingResult.hasErrors()) {
@@ -178,7 +177,7 @@ public class HolidayController {
 
 		holidayService.deleteHoliday(id);
 
-		// 削除後も現在の検索条件をリダイレクト先のクエリパラメータに付与
+		// 削除後も現在の検索条件をリダイレクト先のクエリパラメータに与える
 		addSearchParamAttributes(redirectAttributes, searchDate, searchHolidayName, searchPage);
 		return "redirect:/holiday/list";
 	}

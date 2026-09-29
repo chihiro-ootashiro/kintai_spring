@@ -74,7 +74,7 @@ export default function EmployeeMaster() {
           const latestData = json.find(e => e.employeeNo === targetNum);
 
           if (latestData) {
-            // 見つかったら、その本当に最新のデータで選択状態を上書きする
+            // 見つかったら、その最新のデータで選択状態を上書きする
             setSelectedEmployee(latestData);
           }
         }

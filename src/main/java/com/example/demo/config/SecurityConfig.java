@@ -54,6 +54,7 @@ public class SecurityConfig {
 						.requestMatchers("/employee/input").hasAnyRole("GENERAL", "ADMIN") // 勤怠入力画面は全員がアクセス可能
 						.requestMatchers("/attendance/**").hasRole("ADMIN")//勤怠管理画面は管理者のみ
 						.requestMatchers("/holiday/**").hasRole("ADMIN")//祝日マスタは管理者のみ
+						.requestMatchers("/employee/api/holidays").permitAll() 
 						// 他のリンクは全て認証が必要
 						.anyRequest().authenticated())
 

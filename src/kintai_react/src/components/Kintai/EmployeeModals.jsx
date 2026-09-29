@@ -139,10 +139,10 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                 //親コンポーネントの一覧をリフレッシュして自動検索をかける
                 if (onRefreshList) onRefreshList("");
             } else {
-                // Javaの BindingResult から返ってきたエラーメッセージ配列を取得
+                // Javaの BindingResult から返ってきたエラーメッセージを取得
                 const resData = await response.json();
                 if (Array.isArray(resData)) {
-                    setRegisterErrors(resData); // 配列ごとStateに格納
+                    setRegisterErrors(resData);
                 } else {
                     setRegisterErrors(["登録に失敗しました"]);
                 }
@@ -159,7 +159,7 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
         // 処理開始時に以前のエラー表示をクリア
         setUpdateErrors([]);
 
-        // 送信直前にselectedEmployeeの全中身と、組み立てたformデータをコンソールに出す
+        // 送信直前にselectedEmployeeの中身と、組み立てたformのデータをコンソールに出す
         console.log("① 選択されている社員の全データ:", selectedEmployee);
 
 
@@ -198,7 +198,7 @@ const EmployeeModals = ({ selectedEmployee, onRefreshList }) => {
                 // Javaの BindingResult から返ってきたエラーメッセージ配列を取得
                 const resData = await response.json();
                 if (Array.isArray(resData)) {
-                    setUpdateErrors(resData); // 配列ごとStateに格納
+                    setUpdateErrors(resData);
                 } else {
                     setUpdateErrors(["更新に失敗しました"]);
                 }

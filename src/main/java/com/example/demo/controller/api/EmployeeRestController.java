@@ -48,13 +48,13 @@ public class EmployeeRestController {
 	@GetMapping("/index")
 	public List<EmployeeModel> getIndex(EmployeeSearchForm form) {
 
-		// 1. サービス経由でDBからエンティティのリストを取得
+		//  サービス経由でDBからエンティティのリストを取得
 		List<LoginUser> entityList = loginUserService.getLoginUserList(form);
 
-		// 2. ModelMapper を使って EmployeeModel のリストに詰め替え、日本語をセットする
+		//  ModelMapper を使って EmployeeModel のリストに詰め替え
 		List<EmployeeModel> modelList = entityList.stream()
 				.map(entity -> {
-					// まずは ModelMapper で標準の項目を自動コピー
+					// ModelMapper呼び出し
 					EmployeeModel model = modelMapper.map(entity, EmployeeModel.class);
 
 					// DBから取れた権限コードを見て、権限名をつけなおす
@@ -70,7 +70,7 @@ public class EmployeeRestController {
 				})
 				.collect(Collectors.toList());
 
-		// 3. 画面用のモデルリストを返す
+		// 3. 画面用のリストを返す
 		return modelList;
 	}
 
